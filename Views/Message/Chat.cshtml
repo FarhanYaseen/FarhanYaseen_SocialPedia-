@@ -1,0 +1,175 @@
+﻿@using Project_EAD.Models;
+@{
+    Layout = "~/Views/Shared/Others.cshtml";
+    User user = (User)Session["user"];
+    
+}
+@model List<Message>
+
+
+<div class="span3">
+    @{
+        User friend =null;
+        
+            
+        }
+    @if(TempData["chatWith"]!=null)
+    {
+        friend = (User)TempData["chatWith"];
+    }
+    <div class="content">
+        <div class="module">
+            <div class="module-head">
+                <h3>Friends</h3>
+            </div>
+
+            <div class="module-body" >
+
+                <div class="row-fluid">
+                    <div class="media user">
+
+
+                        <a class="media-avatar pull-left" HREF="javascript:message(@friend.UserName)">
+
+
+                            <img src="@friend.ImagePath">
+                        </a>
+                        <div class="media-body">
+                            <h3 class="media-title">
+                                @friend.Name</h3>
+                            <p>
+                                <small class="muted">Pakistan</small>
+                            </p>
+
+
+                            <div class="media-option btn-group shaded-icon">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+        </div>
+    </div>
+</div>
+
+<script>
+   
+  
+    var typingTimer;                //timer identifier
+    var doneTypingInterval = 5000;
+
+    function loadPage()
+      {
+            $('body').unload();
+            $("body").load("/Message/chat/?userName=" + '@friend.UserName');
+      }
+
+
+//    $('#chat').keyup(
+
+    function Up() {
+      //  alert('Up: 11');
+
+        clearTimeout(typingTimer);
+        typingTimer = setTimeout(function () { loadPage() }, doneTypingInterval);
+
+    }
+    //);
+
+    //on keydown, clear the countdown 
+  //  $('#chat').keydown(
+        
+    function Down() {
+     //   alert('Down: 12');
+       clearTimeout(typingTimer);
+    }
+
+
+    function Message() {
+//        alert("hi");
+
+        msg = $('#chat').val();
+
+        $.getJSON("/Message/ChatMessage/?chat=" + msg + "&MessageTo=" + '@friend.UserName', function (data) {
+
+          typingTimer=  setInterval(function () { loadPage() }, 15000);
+            $('body').unload();
+            $("body").load("/Message/chat/?userName=" + '@friend.UserName');
+        });
+    }
+   
+ </script>
+<div class="span5">
+    <div class="content" id="d3">
+        <div class="module">
+            <div class="module-head">
+                <h3>Chat</h3>
+            </div>
+
+
+            
+            <div class="module-body">
+
+
+                <div class="row-fluid" id="d2">
+                    @{
+                        string friendName="";
+                      }
+                    
+                
+                  
+
+                                    <div class="stream-text">
+                                           <input style="width:80%;height:auto;margin-left:10%;" onChange="Message()" id="chat" type="text" name="chat" value="" placeholder="Send Message"  class="span6" style="height: 30px;" />
+                                    </div>
+                          
+                    
+                     @for(int i=Model.Count-1;i>=0;i--)
+                   {
+                        <div class="media stream">
+
+
+                            <a href="#" class="media-avatar small pull-left">
+                                <img src="@Model[i].User.ImagePath">
+                            </a>
+                            <div class="media-body">
+                                <div class="stream-headline">
+                                    <h5 class="stream-author">
+
+                                        <b>@Model[i].MessageFrom</b><small>@Model[i].MessageDate</small>
+                                    </h5>
+
+                                    <div class="stream-text">
+                                        @Model[i].MessageText
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                       if (!Model[i].User.UserName.Equals(user.UserName))
+                        {
+                            friendName = Model[i].User.UserName;
+                        }
+
+                     
+                    }
+                      
+
+
+                                                                      
+                          
+                     <!--form method="post" onsubmit="/Message/Chat" action="/Message/ChatMessage"-->
+                     
+                         
+                                                
+                         @*Html.Hidden("messageTo", @friend.UserName)*@
+                <!--/!--form-->
+                         </div>
+          
+                  </div>
+      
+              </div>
+    
+    </div>
+</div>
